@@ -679,3 +679,12 @@ iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in th
 iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```
+
+### Custom Headers Usage
+
+Inside your app, api call has now extra parameter for headers, below is sample code:
+
+```
+var customHeaders = 'foo:123,bar:456';
+cordova.InAppBrowser.open("http://apache.org", "_blank", 'location=no,zoom=no', customHeaders);
+```

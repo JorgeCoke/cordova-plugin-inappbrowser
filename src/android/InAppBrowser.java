@@ -74,6 +74,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -135,6 +136,8 @@ public class InAppBrowser extends CordovaPlugin {
     private String footerColor = "";
     private String[] allowedSchemes;
 
+    private Map <String, String> extraHeaders;
+
     /**
      * Executes the request and returns PluginResult.
      *
@@ -153,6 +156,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, String> features = parseFeature(args.optString(2));
+            extraHeaders = parseHeaders(args.optString(3));
 
             LOG.d(LOG_TAG, "target = " + target);
 
@@ -301,6 +305,33 @@ public class InAppBrowser extends CordovaPlugin {
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * Put the list of headers into a map
+     *
+     * @param headerString
+     * @return
+     */
+    private Map<String, String> parseHeaders(String headerString) {
+        if (headerString.equals(NULL)) {
+            Map<String, String> map = new HashMap<String, String>();
+            return map;
+        } else {
+            Map<String, String> map = new HashMap<String, String>();
+            StringTokenizer features = new StringTokenizer(headerString, ",");
+            StringTokenizer option;
+            while(features.hasMoreElements()) {
+                option = new StringTokenizer(features.nextToken(), ":");
+                if (option.hasMoreElements()) {
+                    String key = option.nextToken();
+                    String value = option.nextToken();
+                    map.put(key, value);
+                }
+            }
+            return map;
+        }
     }
 
     /**
@@ -524,9 +555,9 @@ public class InAppBrowser extends CordovaPlugin {
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
 
         if (!url.startsWith("http") && !url.startsWith("file:")) {
-            this.inAppWebView.loadUrl("http://" + url);
+            this.inAppWebView.loadUrl("http://" + url, extraHeaders);
         } else {
-            this.inAppWebView.loadUrl(url);
+            this.inAppWebView.loadUrl(url, extraHeaders);
         }
         this.inAppWebView.requestFocus();
     }
@@ -921,7 +952,7 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
                 }
 
-                inAppWebView.loadUrl(url);
+                inAppWebView.loadUrl(url, extraHeaders);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
@@ -1112,12 +1143,10 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
             // Test for whitelisted custom scheme names like mycoolapp:// or twitteroauthresponse:// (Twitter Oauth Response)
-            else if (!url.startsWith("http:") && !url.startsWith("https:") && url.matches("^[A-Za-z0-9+.-]*://.*?$")) {
+            else if (!url.startsWith("http:") && !url.startsWith("https:") && url.matches("^[a-z]*://.*?$")) {
                 if (allowedSchemes == null) {
-                    String allowed = preferences.getString("AllowedSchemes", null);
-                    if(allowed != null) {
-                        allowedSchemes = allowed.split(",");
-                    }
+                    String allowed = preferences.getString("AllowedSchemes", "");
+                    allowedSchemes = allowed.split(",");
                 }
                 if (allowedSchemes != null) {
                     for (String scheme : allowedSchemes) {
