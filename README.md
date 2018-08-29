@@ -30,6 +30,10 @@ description: Open an in-app browser window.
 ||iOS (9.3) on Xcode 7.3|
 ||Android (4.4)|
 
+# Installation
+
+    ionic cordova plugin add JorgeCoke/cordova-plugin-inappbrowser
+
 # cordova-plugin-inappbrowser
 
 You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
@@ -77,7 +81,7 @@ Report issues with this plugin on the [Apache Cordova issue tracker](https://iss
 ## <a id="reference">Reference</a>
 ## Installation
 
-    cordova plugin add cordova-plugin-inappbrowser
+    ionic cordova plugin add JorgeCoke/cordova-plugin-inappbrowser
 
 If you want all page loads in your app to go through the InAppBrowser, you can
 simply hook `window.open` during initialization.  For example:
